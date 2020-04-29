@@ -1,9 +1,12 @@
 language: c
+sudo: true
 
 install:
   - git clone https://github.com/vlang/v.git
   - cd v
   - make
+  - ls -l
+  - sudo symlink ./v
   - cd ../..
 
 script:
