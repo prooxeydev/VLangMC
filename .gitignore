@@ -2,3 +2,4 @@ main
 VLangMC
 *.so
 *.dll
+*.pdb

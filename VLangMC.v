@@ -17,7 +17,7 @@ fn main() {
 
 		protocol_ver := reader.read_pure_var_int() or { panic(err) }
 		server_address := reader.read_string(10)
-		port := reader.read_short(4)
+		server_port := reader.read_short(4)
 		next_state := reader.read_pure_var_int() or { panic(err) }
 
 	}

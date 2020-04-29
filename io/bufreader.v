@@ -45,7 +45,7 @@ pub fn (reader mut BufferReader) read_pure_var_int() ?int {
 			return error('VarInt is too big!')
 		}
 	}
-	return value | ((b & 0x7F) << (size * 7)
+	return value | (b & 0x7F) << (size * 7)
 }
 
 pub fn (reader mut BufferReader) read_var_int() ?(int, int) {
@@ -61,7 +61,8 @@ pub fn (reader mut BufferReader) read_var_int() ?(int, int) {
 			return error('VarInt is too big!')
 		}
 	}
-	return (value | ((b & 0x7F) << (size * 7), size)
+	result := value | (b & 0x7F) << (size * 7)
+	return result, size
 }
 
 pub fn (reader mut BufferReader) read_string(len int){
