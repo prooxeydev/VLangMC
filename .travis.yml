@@ -6,7 +6,7 @@ install:
   - cd v
   - make
   - ls -l
-  - sudo symlink ./v
+  - ./v version
   - cd ../..
 
 script:
