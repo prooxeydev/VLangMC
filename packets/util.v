@@ -1,7 +1,8 @@
 module packets
 
-import json
-
+//import json
+import net
+/*
 pub struct StatusResponse {
 	version Version
 	players Players
@@ -39,15 +40,15 @@ pub fn create_status_response(version string, protocol int, max_player int, onli
 }
 
 pub fn decode_status_response(response string) ?StatusResponse {
-	response := json.decode(StatusResponse, response) or { return error('Cannot decode response, err: $err') }
-	return response
+	resp := json.decode(StatusResponse, response) or { return error('Cannot decode response, err: $err') }
+	return resp
 }
 
 pub fn encode_status_respone(StatusResponse response) string {
 	data := json.encode(response)
 	return data
 }
-
+*/
 pub fn read_packet_len(sock net.Socket) ?int {
 	mut num_read := 0
 	mut result := 0
@@ -68,4 +69,9 @@ pub fn read_packet_len(sock net.Socket) ?int {
 		}
 	}
 	return result
+}
+
+pub fn create_status_response() string {
+	data := '{"version":{"name":"1.15.2","protocol": 578},"players": {"max": 100,"online": 5,"sample": [{"name": "thinkofdeath","id": "4566e69f-c907-48ee-8d71-d7ba5aa00d20"}]},"description": {"text": "Hello world"},"favicon": "data:image/png;base64,<data>"}'
+	return data.trim_space()
 }

@@ -22,10 +22,10 @@ pub fn (writer mut BufferWriter) set_buffer(buf []byte) {
 pub fn (writer mut BufferWriter) write_var_int(val int) {
 	mut v := val
 	for {
-		if (value & 128) == 0 {
+		if (v & 128) == 0 {
 			break
 		}
-		writer.buf << (value & 127 | 128)
+		writer.buf << (v & 127 | 128)
 		v >>= 7
 	}
 	writer.buf << v
@@ -37,11 +37,39 @@ pub fn (writer mut BufferWriter) write_byte(val byte) {
 
 pub fn (writer mut BufferWriter) write_string(str string) {
 	buf := str.bytes()
-	write_var_int(buf.len)
-	writer.buf << buf
+	writer.write_var_int(buf.len)
+	for b in buf {
+		writer.write_var_int(b)
+	}
 }
 
-pub fn (writer mut BufferWriter) write_short(short u16) {
+pub fn (writer mut BufferWriter) flush(id int) []byte {
+	mut buf := writer.buf.clone()
+	writer.buf = []byte{}
+
+	mut add := 0
+	mut packet_data := [ byte(0x00) ]
+	if id >= 0 {
+		writer.write_var_int(id)
+		packet_data = writer.buf.clone()
+		writer.buf = []byte{}
+		add = packet_data.len
+	}
+
+	writer.write_var_int(buf.len + add)
+	buf_len := writer.buf.clone()
+	writer.buf = []byte{}
+
+	mut result := []byte{}
+
+	result << buf_len
+	result << packet_data
+	result << buf
+
+	return result
+}
+
+/*pub fn (writer mut BufferWriter) write_short(short u16) {
 	mut data := []byte{}
 	binary.big_endian_put_u16(data, short)
 	writer.buf << data
@@ -49,6 +77,6 @@ pub fn (writer mut BufferWriter) write_short(short u16) {
 
 pub fn (writer mut BufferWriter) write_long(long u64) {
 	mut data := []byte{}
-	binary.big_endian_put_u64(data, short)
+	binary.big_endian_put_u64(data, long)
 	writer.buf << data
-}
+}*/

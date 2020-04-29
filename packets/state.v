@@ -1,10 +1,8 @@
 module packets
 
-pub enum State {
-	Handeshake,
-	Status,
-	Ping,
-	Play
-}
-
-type state = State
+const (
+	HANDSHAKE = 0
+	STATUS = 1
+	LOGIN = 2
+	PLAY = 3
+)
