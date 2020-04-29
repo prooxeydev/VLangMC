@@ -4,7 +4,6 @@ install:
   - git clone https://github.com/vlang/v.git
   - cd v
   - make
-  - v
   - cd ../..
 
 script:
