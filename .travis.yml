@@ -10,4 +10,4 @@ install:
   - cd ../..
 
 script:
-  - compiler/v/v .
+  - ./v/v .
