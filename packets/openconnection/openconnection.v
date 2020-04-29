@@ -5,20 +5,21 @@ import packets
 import io
 
 pub fn start(port int, state int, client net.Socket) {
-	match handshake(port, state, client) {
-		1 {
-			if receive_request(state, client) == 0 {
-				send_response(client)
-				if receive_ping(state, client) == 0 {
+	println(state)
+	if state == packets.HANDSHAKE {
+		s := handshake(port, state, client)
+		start(port, s, client)
+	} else if state == packets.STATUS {
+		request := receive_request(state, client)
 
-				}
-			}
+		if request == 0 {
+			send_response(client)
 		}
-		2 {
 
-		}
-		else {
-			return
+		ping := receive_ping(state, client)
+
+		if ping == 0 {
+			
 		}
 	}
 }
@@ -43,6 +44,7 @@ fn handshake(port int, state int, client net.Socket) int {
 
 fn receive_request(state int, client net.Socket) int {
 	request_pkt, _ := packets.read_packet(state, client) or { panic(err) }
+	println(request_pkt.packet_id)
 	if request_pkt.packet_id == 0 && request_pkt.len == 1 {
 		return 0
 	} else {
@@ -57,14 +59,12 @@ fn send_response(client net.Socket) {
 	writer.create_empty()
 	writer.write_var_int(json_len)
 	writer.write_string(json)
-
 	buf := writer.flush(0)
-	println(buf.len)
-	//client.send(buf, buf.len) or { panic(err) }
+	client.send(buf, buf.len) or { panic(err) }
 }
 
 fn receive_ping(state int, client net.Socket) int {
 	ping_pkt, _ := packets.read_packet(state, client) or { panic(err) }
-	println(ping_pkt)
+	println('ping $ping_pkt')
 	return 0
 }
