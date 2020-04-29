@@ -38,12 +38,10 @@ pub fn (writer mut BufferWriter) write_byte(val byte) {
 pub fn (writer mut BufferWriter) write_string(str string) {
 	buf := str.bytes()
 	writer.write_var_int(buf.len)
-	for b in buf {
-		writer.write_var_int(b)
-	}
+	writer.buf << buf
 }
 
-pub fn (writer mut BufferWriter) flush(id int) []byte {
+pub fn (writer mut BufferWriter) flush(id int) ([]byte, []byte, []byte) {
 	mut buf := writer.buf.clone()
 	writer.buf = []byte{}
 
@@ -60,13 +58,7 @@ pub fn (writer mut BufferWriter) flush(id int) []byte {
 	buf_len := writer.buf.clone()
 	writer.buf = []byte{}
 
-	mut result := []byte{}
-
-	result << buf_len
-	result << packet_data
-	result << buf
-
-	return result
+	return buf_len, packet_data, buf
 }
 
 /*pub fn (writer mut BufferWriter) write_short(short u16) {

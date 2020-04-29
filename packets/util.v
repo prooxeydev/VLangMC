@@ -72,6 +72,19 @@ pub fn read_packet_len(sock net.Socket) ?int {
 }
 
 pub fn create_status_response() string {
-	data := '{"version":{"name":"1.15.2","protocol": 578},"players": {"max": 100,"online": 5,"sample": [{"name": "thinkofdeath","id": "4566e69f-c907-48ee-8d71-d7ba5aa00d20"}]},"description": {"text": "Hello world"},"favicon": "data:image/png;base64,<data>"}'
+	data := '{
+	"version": {
+		"name": "1.15.2",
+		"protocol": 578
+	},
+	"players": {
+		"max": 100,
+		"online": 0,
+		"sample": []
+	},
+	"description": {
+		"text": "Hello world"
+	}
+}'
 	return data.trim_space()
 }

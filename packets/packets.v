@@ -14,7 +14,7 @@ pub mut:
 
 pub fn read_packet(state int, sock net.Socket) ?(Packet, io.BufferReader) {
 	len := read_packet_len(sock) or { return error('PacketLength cannot be read') }
-	if len <= 0 { return error('PacketLength is 0') }
+	if len <= 0 { return error('PacketLength is $len') }
 	reader := io.create_buf_reader()
 	buf, _ := sock.recv(len)
 	reader.set_buffer(buf)
