@@ -1,0 +1,13 @@
+language: c
+
+install:
+  - mkdir compiler
+  - cd comiler
+  - git clone https://github.com/vlang/v.git
+  - cd v
+  - make
+  - v
+  - cd ../..
+
+script:
+  - compiler/v/v .
