@@ -1,0 +1,71 @@
+module packets
+
+import json
+
+pub struct StatusResponse {
+	version Version
+	players Players
+	description Description
+	favicon string
+}
+
+struct Version {
+	name string
+	protocol int
+}
+
+struct Players {
+	max int
+	online int
+	sample []PlayerData
+}
+
+struct PlayerData {
+	name string
+	uuid string
+}
+
+struct Description {
+	text string
+}
+
+pub fn create_status_response(version string, protocol int, max_player int, online_player int, players []PlayerData, description string, favicon string) StatusResponse {
+	return StatusResponse{
+		version: Version{version, protocol}
+		players: Players{max_player, online_player, players}
+		description: Description{description}
+		favicon: favicon
+	}
+}
+
+pub fn decode_status_response(response string) ?StatusResponse {
+	response := json.decode(StatusResponse, response) or { return error('Cannot decode response, err: $err') }
+	return response
+}
+
+pub fn encode_status_respone(StatusResponse response) string {
+	data := json.encode(response)
+	return data
+}
+
+pub fn read_packet_len(sock net.Socket) ?int {
+	mut num_read := 0
+	mut result := 0
+	mut read := byte(0)
+
+	for {
+		buffer, _ := sock.recv(1)
+		read = buffer[0]
+		value := (read & 0b01111111)
+		result |= (value << (7 * num_read))
+
+		num_read++
+		if num_read > 5 {
+			return error('VarInt is too long!')
+		}
+		if (read & 0b10000000) == 0 {
+			break
+		}
+	}
+	return result
+}

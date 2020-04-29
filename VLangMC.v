@@ -1,46 +1,25 @@
 module main
 
 import net
+import io
 
 fn main() {
 	port := 4088
+	mut state := State.Handshake
 	socket := net.listen(port) or { panic(err) }
 
 	for {
 		client := socket.accept() or { panic(err) }
 
-		len := read_var_int(client) or { panic(err) }
-		id := read_var_int(client) or { panic(err) }
-		w_id := id.hex()
-		protocol_ver := read_var_int(client) or { panic(err) }
-		host_len := len - id.str().len - protocol_ver.str().len - port.str().len + 2
-		host := read_string(client, host_len)
-		port_r := read_u_short(client, port.str().len)
-		next_state := read_var_int(client) or { panic(err) }
+		handshake_pkt := read_packet(state, client)
+		reader := create_buf_reader()
+		reader.set_buffer(handshake_pkt.data)
 
-		request_len := read_var_int(client) or { panic(err) }
-		request_id := read_var_int(client) or { panic(err) }
-		w_requst_id := request_id.hex()
+		protocol_ver := reader.read_pure_var_int() or { panic(err) }
+		server_address := reader.read_string(10)
+		port := reader.read_short(4)
+		next_state := reader.read_pure_var_int() or { panic(err) }
 
-		println('Request with len:$request_len with id 0x$w_requst_id')
-
-		response := create_response_string()
-		mut response_len := response.len
-
-		response_len = write_var_int(len)
-
-		println(response_len)
-
-		//client.send(byte(response_len), response_len.bytes().len)
-		
-		ping_len := read_var_int(client) or { panic(err) }
-		ping_id := read_var_int(client) or { panic(err) }
-		w_ping_id := ping_id.hex()
-
-		println('Request with len:$ping_len with id 0x$w_ping_id')
-
-		//payload := read_long(client, ping_len)
-	
 	}
 
 	socket.close() or { panic(err) }
