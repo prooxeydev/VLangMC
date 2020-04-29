@@ -7,7 +7,7 @@ install:
   - make
   - ls -l
   - ./v version
-  - cd ../..
+  - cd ..
 
 script:
-  - ./v/v .
+  - v/v .
