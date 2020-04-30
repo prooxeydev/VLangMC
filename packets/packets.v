@@ -8,8 +8,6 @@ pub:
 	state State
 	len int
 	packet_id int
-pub mut:
-	data []byte
 }
 
 pub fn read_packet(state State, sock net.Socket) ?(Packet, io.BufferReader) {
@@ -28,6 +26,5 @@ fn read_packet_data(len int, state State, reader &io.BufferReader) ?Packet {
 		state: state
 		len: len
 		packet_id: pack_id
-		data: string(reader.buf).bytes()
-		}
+	}
 }

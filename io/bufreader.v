@@ -69,8 +69,21 @@ pub fn (reader mut BufferReader) read_var_int() ?(int, int) {
 	return result, size
 }
 
-fn convert_byte(b byte) byte {
-	return (b & 0b01111111)
+pub fn (reader mut BufferReader) read_var(max int) i64 {
+	mut value := i64(0)
+	mut size := 0
+	for {
+		b := reader.read_byte()
+
+		value |= (b & 0x7F) << (size++ * 7)
+		if size > max {
+			return 0
+		}
+		if (b & 0x80) != 0x80 {
+			break
+		}
+	}
+	return value
 }
 
 pub fn (reader mut BufferReader) read_string() string {
@@ -92,20 +105,11 @@ pub fn (reader mut BufferReader) read_short(len int) u16 {
 	return binary.big_endian_u16(result)
 }
 
-pub fn (reader mut BufferReader) read_long(len int) u64 {
-	mut result := []byte{}
-	
-	for i := 0; i < len; i++ {
-		b := reader.read_byte()
-		result << b
-	}
-
-	return binary.big_endian_u64(result)
+pub fn (reader mut BufferReader) read_long() i64 {
+	return i64(binary.big_endian_u64(reader.read(8)))
 }
 
 pub fn (reader mut BufferReader) read_var_int_enum() int {
-	a, b := reader.read_var_int() or { panic(err) }
-	println('Le A: $a')
-	println('Le B: $b')
+	a, _ := reader.read_var_int() or { panic(err) }
 	return a.str().len
 }

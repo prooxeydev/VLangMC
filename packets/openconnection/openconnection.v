@@ -5,22 +5,23 @@ import packets
 import io
 
 pub fn start(port int, state packets.State, client net.Socket) {
-	println('state: $state')
 	if state == packets.State.Handshake {
 		s := handshake(port, state, client)
 		start(port, s, client)
 	} else if state == packets.State.Status {
 		request := receive_request(state, client)
 
-		println('received request')
+		println('send response')
 
 		if request == 0 {
 			send_response(client)
 		}
 
-		println('send response')
+
 
 		ping := receive_ping(state, client)
+		println('send ping with payload $ping')
+		
 		send_pong(ping, client)
 	}
 }
@@ -33,10 +34,10 @@ fn handshake(port int, state packets.State, client net.Socket) int {
 	server_port := reader.read_short(4)
 	next_state := reader.read_var_int_enum()
 
-	println(server_address.len)
+//	println(server_address.len)
 	println('protocol: $protocol_ver')
-	println('host: $server_address')
-	println('port: $server_port')
+//	println('host: $server_address')
+//	println('port: $server_port')
 	println('next_s: $next_state')
 
 	return next_state
@@ -66,7 +67,7 @@ fn send_response(client net.Socket) {
 
 fn receive_ping(state int, client net.Socket) int {
 	ping_pkt, reader := packets.read_packet(state, client) or { panic(err) }
-	payload := reader.read_long(ping_pkt.len - ping_pkt.packet_id.str().len)
+	payload := reader.read_long()
 	return payload
 }
 

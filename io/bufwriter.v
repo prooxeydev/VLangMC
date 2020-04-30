@@ -42,13 +42,15 @@ pub fn (writer mut BufferWriter) write_string(str string) {
 }
 
 pub fn (writer mut BufferWriter) write_u_long(l u64) {
-	mut data := []byte{}
 	mut v := l
-	for i := 0; i < 6; i++ {
-		data << byte(v >> u64(56 - (i * 8)))
-	}
-	data << byte(v)
-	writer.buf << data
+	writer.buf << byte(v>>56)
+	writer.buf << byte(v>>48)
+	writer.buf << byte(v>>40)
+	writer.buf << byte(v>>32)
+	writer.buf << byte(v>>24)
+	writer.buf << byte(v>>16)
+	writer.buf << byte(v>>8)
+	writer.buf << byte(v)
 }
 
 pub fn (writer mut BufferWriter) flush(id int) []byte {
@@ -69,8 +71,6 @@ pub fn (writer mut BufferWriter) flush(id int) []byte {
 	writer.buf = []byte{}
 
 	mut b := []byte{}
-
-	println(buf)
 
 	b << buf_len
 	b << packet_data
