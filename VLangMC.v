@@ -6,7 +6,7 @@ import packets
 
 fn main() {
 	port := 4088
-	mut state := packets.HANDSHAKE
+	mut state := packets.State.Handshake
 	socket := net.listen(port) or { panic(err) }
 
 	for {
