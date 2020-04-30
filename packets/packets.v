@@ -5,14 +5,14 @@ import io
 
 pub struct Packet {
 pub:
-	state int
+	state State
 	len int
 	packet_id int
 pub mut:
 	data []byte
 }
 
-pub fn read_packet(state int, sock net.Socket) ?(Packet, io.BufferReader) {
+pub fn read_packet(state State, sock net.Socket) ?(Packet, io.BufferReader) {
 	len := read_packet_len(sock) or { return error('PacketLength cannot be read') }
 	if len <= 0 { return error('PacketLength is $len') }
 	reader := io.create_buf_reader()
@@ -22,7 +22,7 @@ pub fn read_packet(state int, sock net.Socket) ?(Packet, io.BufferReader) {
 	return packet, reader
 }
  
-fn read_packet_data(len int, state int, reader &io.BufferReader) ?Packet {
+fn read_packet_data(len int, state State, reader &io.BufferReader) ?Packet {
 	pack_id := reader.read_pure_var_int() or { return error('PacketID cannot be read') }
 	return Packet{
 		state: state
