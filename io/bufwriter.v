@@ -41,7 +41,17 @@ pub fn (writer mut BufferWriter) write_string(str string) {
 	writer.buf << buf
 }
 
-pub fn (writer mut BufferWriter) flush(id int) ([]byte, []byte, []byte) {
+pub fn (writer mut BufferWriter) write_u_long(l u64) {
+	mut data := []byte{}
+	mut v := l
+	for i := 0; i < 6; i++ {
+		data << byte(v >> u64(56 - (i * 8)))
+	}
+	data << byte(v)
+	writer.buf << data
+}
+
+pub fn (writer mut BufferWriter) flush(id int) []byte {
 	mut buf := writer.buf.clone()
 	writer.buf = []byte{}
 
@@ -58,17 +68,20 @@ pub fn (writer mut BufferWriter) flush(id int) ([]byte, []byte, []byte) {
 	buf_len := writer.buf.clone()
 	writer.buf = []byte{}
 
-	return buf_len, packet_data, buf
+	mut b := []byte{}
+
+	println(buf.len)
+
+	b << buf_len
+	b << packet_data
+	b << buf
+
+	return b
 }
 
 /*pub fn (writer mut BufferWriter) write_short(short u16) {
 	mut data := []byte{}
 	binary.big_endian_put_u16(data, short)
 	writer.buf << data
-}
-
-pub fn (writer mut BufferWriter) write_long(long u64) {
-	mut data := []byte{}
-	binary.big_endian_put_u64(data, long)
-	writer.buf << data
 }*/
+
