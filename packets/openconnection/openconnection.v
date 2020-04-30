@@ -22,7 +22,6 @@ pub fn start(port int, state packets.State, client net.Socket) {
 
 		ping := receive_ping(state, client)
 		send_pong(ping, client)
-		
 	}
 }
 
@@ -68,7 +67,6 @@ fn send_response(client net.Socket) {
 fn receive_ping(state int, client net.Socket) int {
 	ping_pkt, reader := packets.read_packet(state, client) or { panic(err) }
 	payload := reader.read_long(ping_pkt.len - ping_pkt.packet_id.str().len)
-	println(payload.str().len)
 	return payload
 }
 

@@ -70,7 +70,7 @@ pub fn (writer mut BufferWriter) flush(id int) []byte {
 
 	mut b := []byte{}
 
-	println(buf.len)
+	println(buf)
 
 	b << buf_len
 	b << packet_data
