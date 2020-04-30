@@ -21,12 +21,8 @@ pub fn start(port int, state packets.State, client net.Socket) {
 		println('send response')
 
 		ping := receive_ping(state, client)
-
-		println('received ping')
-
-		if ping == 0 {
-			
-		}
+		send_pong(ping, client)
+		
 	}
 }
 
@@ -58,36 +54,32 @@ fn receive_request(state packets.State, client net.Socket) int {
 
 fn send_response(client net.Socket) {
 	json := packets.create_status_response()
-	json_len := json.len
 	writer := io.create_buf_writer()
 	writer.create_empty()
-	writer.write_var_int(json_len)
 	writer.write_string(json)
-	buf_len, packet_data, buf := writer.flush(0)
 
-	mut b := []byte{}
-	b << buf_len
-	b << packet_data
-	b << buf
-
-	reader := io.create_buf_reader()
-	reader.set_buffer(b)
-
-	len := reader.read_pure_var_int() or { panic(err) }
-	packet_id := reader.read_pure_var_int() or { panic(err) }
-	json_len_i := reader.read_pure_var_int() or { panic(err) }
-
-	println('Packet len: $len')
-	println('Packet id: $packet_id')
-	println('json len: $json_len_i')
-
-	//client.send(buf_len, buf_len.len) or { panic(err) }
-	//client.send(packet_data, packet_data.len) or { panic(err) }
-	//client.send(buf, buf.len) or { panic(err) }
+	buf := writer.flush(0)
+	
+	for data in buf {
+		client.send(data, 1) or { panic(err) }
+	}
 } 
 
 fn receive_ping(state int, client net.Socket) int {
-	ping_pkt, _ := packets.read_packet(state, client) or { panic(err) }
-	println('ping_packet: $ping_pkt')
-	return 0
+	ping_pkt, reader := packets.read_packet(state, client) or { panic(err) }
+	payload := reader.read_long(ping_pkt.len - ping_pkt.packet_id.str().len)
+	println(payload.str().len)
+	return payload
+}
+
+fn send_pong(pong u64, client net.Socket) {
+	writer := io.create_buf_writer()
+	writer.create_empty()
+	writer.write_u_long(pong)
+
+	buf := writer.flush(1)
+
+	for data in buf {
+		client.send(data, 1) or { panic(err) }
+	}
 }
