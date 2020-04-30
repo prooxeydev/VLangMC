@@ -31,15 +31,14 @@ pub fn start(port int, state packets.State, client net.Socket) {
 }
 
 fn handshake(port int, state packets.State, client net.Socket) int {
-	handshake_pkt, mut reader := packets.read_packet(state, client) or { panic(err) }
+	_, mut reader := packets.read_packet(state, client) or { panic(err) }
 
 	protocol_ver := reader.read_pure_var_int() or { panic(err) }
-	reader.offset++
-	address_len := handshake_pkt.len - handshake_pkt.packet_id.str().len - protocol_ver.str().len - port.str().len + 1
-	server_address := reader.read_string(address_len)
+	server_address := reader.read_string()
 	server_port := reader.read_short(4)
 	next_state := reader.read_var_int_enum()
 
+	println(server_address.len)
 	println('protocol: $protocol_ver')
 	println('host: $server_address')
 	println('port: $server_port')

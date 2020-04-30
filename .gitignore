@@ -3,3 +3,6 @@ VLangMC
 *.so
 *.dll
 *.pdb
+
+*.exe
+*.ilk

@@ -73,13 +73,10 @@ fn convert_byte(b byte) byte {
 	return (b & 0b01111111)
 }
 
-pub fn (reader mut BufferReader) read_string(len int) string {
+pub fn (reader mut BufferReader) read_string() string {
 	mut data := []byte{}
-
-	for b in reader.read(len) {
-		conv := convert_byte(b)
-		data << conv
-	}
+	len := reader.read_pure_var_int() or { panic(err) }
+	data << reader.read(len)
 
 	return string(data)
 }
@@ -107,6 +104,8 @@ pub fn (reader mut BufferReader) read_long(len int) u64 {
 }
 
 pub fn (reader mut BufferReader) read_var_int_enum() int {
-	a, _ := reader.read_var_int() or { panic(err) }
+	a, b := reader.read_var_int() or { panic(err) }
+	println('Le A: $a')
+	println('Le B: $b')
 	return a.str().len
 }
